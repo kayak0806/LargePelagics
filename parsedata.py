@@ -16,13 +16,15 @@ def openFile(fname):
 
 def parseFile(fname):
 	fin = openFile(fname)
-	print 'merp'
 	fin.readline()
 	points = []
 	for line in fin:
 	  #line: year, month, day, hour, minute, second, light, depth, temp
 		line = line.split(" ")
-		line = [int(i) for i in line]
+		for i in range(6):
+			line[i]=int(line[i])
+		for i in range(3):
+			line[i+6]=float(line[i+6])
 		date = datetime.datetime(line[0],line[1],line[2],line[3],line[4],line[5])
 		point = [date,line[6],line[7],line[8]]
 		points.append(point)
