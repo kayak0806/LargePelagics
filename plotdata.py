@@ -9,7 +9,7 @@ lightData = [point[2] for point in rawData]
 
 # print lightData
 
-width = 1000
+width = 500
 thinkplot.Scatter(timeData[:width],lightData[:width])
-thinkplot.Show(xticks=timeData[:width])
+thinkplot.Show()
 
