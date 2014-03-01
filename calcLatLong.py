@@ -3,64 +3,76 @@ import datetime
 import math
 import thinkplot
 
-dateCurrent = datetime.datetime.utcnow() # create a datetime object for now
-altCurrent = Pysolar.GetAltitude(42.293247,-71.263633,dateCurrent)
-azmCurrent = Pysolar.GetAzimuth(42.293247,-71.263633,dateCurrent)
-datenoon =  dateCurrent.replace(hour = 12, minute = 0,second=0,microsecond=0)
-altNoon = Pysolar.GetAltitude(42.293247,-71.263633,dateCurrent)
-posNE = (42.293247,-71.263633)
-
-def getLat(lon, day, altGoal):
-
-	for lat in range(-90,90):
-		print Pysolar.GetAltitude(lat,lon,day)
-
-	return lat
-
-timeRise = datetime.time(10,22)
-timeSet = datetime.time(21,34)
-
-sunrise = datetime.datetime.combine(dateCurrent.date(),timeRise)
-sunset  = datetime.datetime.combine(dateCurrent.date(),timeSet)
-
-print Pysolar.GetAltitude(posNE[0],posNE[1],sunrise)
-print Pysolar.GetAltitude(posNE[0],posNE[1],sunset)
-
-# Sweep over all lat/long
-def fullSweep():
-	longRange = [i-180 for i in range(360+1)]
-	latRange = [i-90 for i in range(180+1)]
-
-	match = []
-	Rise = []
-	Set = []
-
-	for lat in latRange:
-		for lon in longRange:
-			matchRise = math.floor(Pysolar.GetAltitude(lat,lon,sunrise))==0
-			matchSet  = math.floor(Pysolar.GetAltitude(lat,lon,sunset))==0
-			if (matchRise and matchSet):
-				match.append( (lat,lon) )
-			if (matchRise):
-				Rise.append((lat,lon))
-			if (matchSet):
-				Set.append((lat,lon))
 
 
-	print match
-	latAlt,lonAlt = zip(*match)
-	# latAzm,lonAzm = zip(*Set)
-	thinkplot.Scatter(lonAlt,latAlt)
-	# thinkplot.Scatter(lonAzm,latAzm)
-	thinkplot.Show()
-
-# fullSweep()
-
-def calcLatLon(riseTime,setTime,day):
+def calcLatLon(riseTime,setTime,day, approx=(42,-71)):
 	# riseTime: time when rising sun is at horizon
 	# setTime: time when setting sun is at horizon
 	# day: date of measurment
-	# returns: (latitude, longitude)
+	# approx: approximate known posion ()
+	# returns: matchimg position on same side of earth as approx
 
-	# get datetime of rise and setting
-	# 
+	longRange = [i-180 for i in range(360+1)]
+	latRange = [i-90 for i in range(180+1)]
+
+	riseDate = datetime.datetime.combine(day,riseTime)
+	setDate = datetime.datetime.combine(day,setTime)
+
+	matches = []
+
+	for lat in latRange:
+		for lon in longRange:
+			riseAlt = Pysolar.GetAltitude(lat,lon,riseDate)
+			setAlt = Pysolar.GetAltitude(lat,lon,setDate)
+			matchRise = math.floor(riseAlt)==0
+			matchSet  = math.floor(setAlt)==0
+			if (matchRise and matchSet):
+				matches.append( (lat,lon) )
+
+	twoMatches = splitMatches(matches)
+	return closestMatch(twoMatches,approx)
+
+
+
+def splitMatches(matches):
+	# There will always be two match ponts directly across from each other
+	# Take the rough matches, split by which side they're on
+	# average and return both exact matches
+
+	# get average
+	X,Y = zip(*matches)
+	aveX = sum(X)/len(X)
+	# split matches
+	matchA = []
+	matchB = []
+	for p in matches:
+		x,y = p
+		if (x<aveX):
+			matchA.append((x,y))
+		else:
+			matchB.append((x,y))
+	# average positions
+	xA,yA=zip(*matchA)
+	xA = sum(xA)/len(xA)
+	yA = sum(yA)/len(yA)
+	xB,yB=zip(*matchB)
+	xB = sum(xB)/len(xB)
+	yB = sum(yB)/len(yB)
+
+	return [(xA,yA),(xB,yB)]
+
+def closestMatch(matches, guess):
+	# The two matches will always be directly across from each other
+	# The guess just has to be in the right hemisphere
+	xA,yA = matches[0]
+	xB,yB = matches[1]
+
+	distA = ((guess[0]-xA)**2 + (guess[1]-yA)**2)**.5
+	distB = ((guess[0]-xB)**2 + (guess[1]-yB)**2)**.5
+	
+	if (distA<distB):
+		return (xA,yA)
+	else:
+		return (xB,yB)
+
+
