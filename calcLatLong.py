@@ -5,9 +5,9 @@ import thinkplot
 
 
 
-def calcLatLon(riseTime,setTime,day, approx=(42,-71)):
-	# riseTime: time when rising sun is at horizon
-	# setTime: time when setting sun is at horizon
+def calcLatLon(riseDate,setDate, approx=(42,-71)):
+	# riseDate: datetime when rising sun is at horizon
+	# setDate: datetime when setting sun is at horizon
 	# day: date of measurment
 	# approx: approximate known posion ()
 	# returns: matchimg position on same side of earth as approx
@@ -15,8 +15,8 @@ def calcLatLon(riseTime,setTime,day, approx=(42,-71)):
 	longRange = [i-180 for i in range(360+1)]
 	latRange = [i-90 for i in range(180+1)]
 
-	riseDate = datetime.datetime.combine(day,riseTime)
-	setDate = datetime.datetime.combine(day,setTime)
+	# riseDate = datetime.datetime.combine(day,riseTime)
+	# setDate = datetime.datetime.combine(day,setTime)
 
 	matches = []
 
