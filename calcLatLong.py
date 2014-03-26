@@ -4,7 +4,8 @@ import datetime
 import math
 import thinkplot
 
-
+'''calcLatLon gets rise/set from lat/lon
+	calcRiseSet gets lat/lon from rise/set'''
 
 def calcLatLon(riseDate,setDate, approx=(42,-71)):
 	# riseDate: datetime when rising sun is at horizon
@@ -34,6 +35,7 @@ def calcLatLon(riseDate,setDate, approx=(42,-71)):
 	return current[1]
 
 def calcLatLon2(riseDate,setDate, approx=(42,-71)):
+	# NOT WORKING YET
 	# riseDate: datetime when rising sun is at horizon
 	# setDate: datetime when setting sun is at horizon
 	# approx: approximate known posion ()
@@ -73,8 +75,6 @@ def calcRiseSet(lat,lon,date):
 	d.replace(tzinfo = UTC())
 	sunrise,sunset =  Pysolar.util.GetSunriseSunset(lat,lon,d,0)
 	return (sunrise, sunset)
-
-
 
 class UTC(datetime.tzinfo):
 	def utcoffset(self,dt):

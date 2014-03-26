@@ -44,7 +44,7 @@ def getDays(data):
 	dif = (last-first).days
 	return [ first + datetime.timedelta(days=x) for x in range(0,dif) ]
 
-def getRiseSet2(day,fulldata):
+def getRiseSet(day,fulldata):
 	# takes a datetime.day object and a list of data
 	# returns a list of (sunrise,sunset) datetime.datetime objects
 
@@ -70,7 +70,7 @@ def allRiseSet(fulldata):
 	days = getDays(fulldata)
 	times = []
 	for day in days:
-		rise,sset = getRiseSet2(day,fulldata)
+		rise,sset = getRiseSet(day,fulldata)
 		times.append((rise,sset))
 	return times
 
