@@ -1,16 +1,15 @@
 """parsedata.py"""
 
 """Reads drifter.tab and returns an array of datapoints. 
-Each datapoint is an array of datetime, light, depth, temeperature."""
+Each datapoint is an array of datetime, depth, light, temeperature."""
 
 
 import datetime
 import argparse
 
-def openFile(fname):
-  
+def openFile(fname,flag='r'):  
 
-  fin = open(fname)
+  fin = open(fname,flag)
 
   return fin
 
@@ -28,18 +27,20 @@ def parseFile(fname):
 		date = datetime.datetime(line[0],line[1],line[2],line[3],line[4],line[5])
 		point = [date,line[6],line[7],line[8]]
 		points.append(point)
+	fin.close()
 	return points
-	
+
 
 def main():
 
   parser = argparse.ArgumentParser()
-  parser.add_argument('name')
+  parser.add_argument('input')
   args = parser.parse_args()
 
-  fname = args.name
-  print parseFile(fname)
-  
+  fname = args.input
+  out = parseFile(fname)
+  print out
+
   
   #print parseFile('drifter.tab')
 
