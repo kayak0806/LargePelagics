@@ -1,8 +1,7 @@
 import datetime
 
-def destring(str):
-	format = "%y %m %d %H %M"
-	return datetime.datetime.strptime(str,format)
+
+
 
 def readFile(filename):
 	fin = open(filename,'r')
@@ -15,6 +14,14 @@ def readFile(filename):
 	return data
 
 
+
+
+
+# Helper functionis
+def destring(str):
+	format = "%y %m %d %H %M"
+	return datetime.datetime.strptime(str,format)
+
 if __name__=="__main__":
 	data = readFile('mooring.txt')
-	print data[0]
+	print data
