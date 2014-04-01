@@ -2,6 +2,7 @@ import datetime
 import sunloc
 import numpy
 import thinkplot
+import introduceError
 # import (error stuff)
 '''
 plan for main:
@@ -36,14 +37,19 @@ for day in dates:
 
 # introduce error
 sigma = 5 # 95% of errors will be +/- 10 minutes
-size = 25 # generate 100 values
-errors = []
+size = 5 # generate 100 values
+errorsLat = []
+errorsLon = []
 
 for day in riseSet:
-    errors.append([day]) # add error stuff
+    error = introduceError.introduceError(0,sigma,size,day)
+    errorsLat.append(error[0]) # add error stuff
+    errorsLon.append(error[1])
 
 
 # calculate location
+print 'location'
+print len(errorsLat)
 def allLocations(day):
     '''calculates the location for each (rise,set) datetime in array'''
     loc = []
@@ -52,11 +58,12 @@ def allLocations(day):
     return loc
 
 locations = []
-for day in errors:
+for day in errorsLat:
     locations.append(allLocations(day))
 
 
 # find accuracy
+print 'accuracy'
 def accuracy(locations, start):
     lat,lon = start
     lats,lons = zip(*locations)

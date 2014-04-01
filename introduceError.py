@@ -1,33 +1,33 @@
 #input 3 things
-#mu, mean, sunrise,sunset datetime
+#mu, sigma, sunrise,sunset datetime
 #output two lists of changed sunrise, sunset datetime, sunrise, changed sunset datetime
 
 import random
 from datetime import timedelta, datetime, date
 import datetime
 
-def rError(mu,mean,datetime):
+def rError(mu,sigma,datetimes):
 
-	integer = random.gauss(mu,mean)
-	d = timedelta(minutes=integer)*10
-	r = (d + datetime[0],datetime[1])
+	integer = random.gauss(mu,sigma)
+	d = timedelta(minutes=integer)
+	r = (d + datetimes[0],datetimes[1])
 
 	return r
 
-def sError(mu,mean,datetime):
+def sError(mu,sigma,datetimes):
 
-	integer = random.gauss(mu,mean)
-	d = timedelta(minutes=integer)*10
-	s = (datetime[0],d + datetime[1])
+	integer = random.gauss(mu,sigma)
+	d = timedelta(minutes=integer)
+	s = (datetimes[0],d + datetimes[1])
 
 	return s
 
-def introduceError(mu,mean,number,datetime):
+def introduceError(mu,sigma,number,datetimes):
 	rs = []
 	ss = []
-	for blah in range(number):
-		r = rError(mu,mean,datetime)
-		s = sError(mu,mean,datetime)
+	for i in range(number):
+		r = rError(mu,sigma,datetimes)
+		s = sError(mu,sigma,datetimes)
 		rs.append(r)
 		ss.append(s)
 	return rs, ss
