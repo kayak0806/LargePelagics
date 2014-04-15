@@ -2,12 +2,11 @@ import Pysolar
 from Pysolar import util
 import datetime
 import math
-import thinkplot
 
 '''calcLatLon gets rise/set from lat/lon
 	calcRiseSet gets lat/lon from rise/set'''
 
-def calcLatLon(riseDate,setDate, approx=(42,-71)):
+def calcLatLon(riseDate,setDate, approx=(30,-60)):
 	# riseDate: datetime when rising sun is at horizon
 	# setDate: datetime when setting sun is at horizon
 	# approx: approximate known posion ()
@@ -17,13 +16,16 @@ def calcLatLon(riseDate,setDate, approx=(42,-71)):
 	altSet = Pysolar.GetAltitude(approx[0],approx[1], setDate)
 	dist = ( altRise**2 + altSet**2 )**0.5
 	current = (dist,approx)
-	while (math.floor(current[0])!=0):
+	i=0
+	while (math.floor(current[0]*10.0)/10>=1):
+		i+=1
+		# print current
 		latCur,lonCur = current[1]
 		next = [
-			(latCur+1,lonCur),
-			(latCur,lonCur+1),
-			(latCur-1,lonCur),
-			(latCur,lonCur-1)
+			(latCur+.1,lonCur),
+			(latCur,lonCur+.1),
+			(latCur-.1,lonCur),
+			(latCur,lonCur-.1)
 			]
 		nextVal = []
 		for lat,lon in next:
@@ -32,6 +34,7 @@ def calcLatLon(riseDate,setDate, approx=(42,-71)):
 			dist = ( altRise**2 + altSet**2 )**0.5
 			nextVal.append((dist,(lat,lon)))
 		current = min(nextVal)
+	print i
 	return current[1]
 
 def calcLatLon2(riseDate,setDate, approx=(42,-71)):
@@ -83,3 +86,60 @@ class UTC(datetime.tzinfo):
 		return datetime.timedelta(hours=0)
 	def tzname(self,dt):
 		return "UTC"
+
+def main():
+	# for every possible latitude (-90 to 90)
+	# and every possible longitude (-180 to 180)
+	# at some scale (ie 1degree, 0.1degree, etc)
+	# calculate the "distance" between the rise-set time
+	# at that position and the actual rise-set time
+	# plot those values
+
+	class World(object):
+		def __init__(self,scale):
+			self.scale = scale
+			self.values = dict()
+			maxlat,maxlon = 90/scale,180/scale
+			self.lats = [i-(90+1)  for i in range(90*2+1)]
+			self.lons = [i-(180+1) for i in range(180*2+1)]
+			for lat in self.lats:
+				for lon in self.lons:
+					self.values[(lat,lon)]=0
+
+		def allPos(self):
+			return self.values.keys()
+
+		def value(self,pos):
+			if pos in self.values:
+				return self.values[pos]
+			else:
+				print "not a valid location\n"
+				return 0
+		def write(self,	pos,value):
+			if pos in self.values:
+				self.values[pos]=value
+				return 1
+			else:
+				print "not a valid location\n"
+				return 0
+
+	world = World(10)
+	today = datetime.date.today()
+	riseTime = datetime.time(10,2)
+	setTime = datetime.time(23,26)
+	riseDate = datetime.datetime.combine(today,riseTime)
+	setDate = datetime.datetime.combine(today,setTime)
+
+	for pos in world.allPos():
+		lat,lon = pos
+		altRise = Pysolar.GetAltitude(lat,lon, riseDate)
+		altSet = Pysolar.GetAltitude(lat,lon, setDate)
+		dist = ( altRise**2 + altSet**2 )**0.5
+		world.write(pos,dist)
+	print len(world.allPos())
+		
+
+
+
+if __name__ == '__main__':
+	main()
