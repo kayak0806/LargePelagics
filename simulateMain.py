@@ -5,6 +5,7 @@ import thinkplot
 import introduceError
 import matplotlib.pyplot as plt
 import scipy.stats
+import cProfile
 # import (error stuff)
 '''
 plan for main:
@@ -38,8 +39,8 @@ for day in dates:
     riseSet.append(sunloc.calcRiseSet(lat,lon,day))
 
 # introduce error
-sigma = 5 # 95% of errors will be +/- 10 minutes
-size = 5 # generate 100 values
+sigma = 5 
+size = 5 
 errorsLat = []
 errorsLon = []
 
@@ -48,10 +49,6 @@ for day in riseSet:
     errorsLat.append(error[0]) # add error stuff
     errorsLon.append(error[1])
 
-
-# calculate location
-print 'location'
-print len(errorsLat)
 def allLocations(day):
     '''calculates the location for each (rise,set) datetime in array'''
     loc = []
@@ -60,6 +57,7 @@ def allLocations(day):
     return loc
 
 locations = []
+
 for day in errorsLat:
     locations.append(allLocations(day))
 
@@ -70,8 +68,6 @@ def mean_confidence_interval(data, confidence=0.95):
     h = se * scipy.stats.t._ppf((1+confidence)/2., n-1)
     return m, m-h, m+h
 
-# find accuracy
-print 'accuracy'
 def accuracy(locations, start):
     lat,lon = start
     lats,lons = zip(*locations)
@@ -79,34 +75,59 @@ def accuracy(locations, start):
     dlon = [l-lon for l in lons]
     latinfo = mean_confidence_interval(dlat)
     loninfo = mean_confidence_interval(dlon)
-
-    #meanLat = numpy.mean(dlat)
-    #meanLon = numpy.mean(dlon)
-    #return (meanLat, meanLon)
     return latinfo,loninfo
+
 latinfos = []
 loninfos= []
+
+
 for day in locations:
     latinfo,loninfo=accuracy(day,(lat,lon))
     latinfos.append(latinfo)
     loninfos.append(loninfo)
 
-print 'averages'
+def timeConversion(a):
+    #defunct
+    pass
 
-#means,uppers,lowers = zip(*latinfos)
-means,uppers,lowers = zip(*loninfos)
+    # for info in a:
+    #     for thing in info[0]:
+    #         lat=thing[0]
+    #         lon=thing[1]
+    #         times.append(sunloc.calcRiseSet(lat,lon,info[1]))
+    # print times
+    # sunloc.calcRiseSet(info)
 
-# plot accuracy
+means,uppers,lowers = zip(*latinfos)
+#means,uppers,lowers = zip(*loninfos)
 
-#print len(averages), len(dates)
-#aveLat,aveLon = zip(*averages)
+print means
 
+def calculateDays(averages):
+#calculate dates the months where function is most accurate 
 
-#thinkplot.Scatter(dates,aveLat)
+    a = [ i for i in range(len(averages)) if abs(averages[i])<1]
+    print a
 
-plt.plot(dates,means)
-plt.plot(dates,uppers)
-plt.plot(dates,lowers)
-plt.show()
-#thinkplot.Scatter(dates,aveLon)
-#thinkplot.Show()
+    b = [ dates[a[i]] for i in range(len(a))]
+    print b
+
+#calculateDays(means)
+
+def plotAccuracy(averages,ups,downs):
+#plots the summary analysis graph
+    from matplotlib.dates import HourLocator, DayLocator, DateFormatter
+
+    plt.plot(dates,averages)
+    plt.plot(dates,ups)
+    plt.plot(dates,downs)
+    days = DayLocator(interval=1)
+    hours = HourLocator(interval=6)
+    daysFmt = DateFormatter('%d')
+    plt.gca().xaxis.set_major_locator(days)
+    plt.gca().xaxis.set_major_formatter(daysFmt)
+    plt.gca().xaxis.set_minor_locator(hours)
+    plt.xticks(rotation=30,ha='right')
+    plt.show()
+
+plotAccuracy(means,uppers,lowers)
