@@ -5,12 +5,13 @@ import math
 import numpy
 from matplotlib import pyplot as plt
 from scipy.stats import norm
+import sunloc
 
 class World(object):
 		def __init__(self,scale):
 			self.scale = scale
 			self.values = dict()
-			latRange,lonRange = (-90,90),(-180,180)
+			latRange,lonRange = (-89,89),(-179,179)
 			self.lats = [latRange[0]+scale*i  for i in range(int((latRange[1]-latRange[0])/scale))]
 			self.lons = [lonRange[0]+scale*i  for i in range(int((lonRange[1]-lonRange[0])/scale))]
 			for lat in self.lats:
@@ -60,11 +61,11 @@ today = datetime.date.today()
 # riseDate = datetime.datetime.combine(today,riseTime)
 # setDate = datetime.datetime.combine(today,setTime)
 lat,lon = 42,-71.264406
-riseDate,setDate = calcRiseSet(0,0,today)
+riseDate,setDate = sunloc.calcRiseSet(0,0,today)
 
 for pos in world.allPos():
   lat,lon = pos
-  rDate,sDate = sunloc.getRiseSet(lat,lon,today)
+  rDate,sDate = sunloc.calcRiseSet(lat,lon,today)
   rDif = (rDate - riseDate).total_seconds()
   sDif = (sDate - setDate).total_seconds()
   prob = riseProb(lat,lon,today,rDif)*setProb(lat,lon,today,sDif)
