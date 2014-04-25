@@ -5,6 +5,7 @@ import math
 import numpy
 from matplotlib import pyplot as plt
 from scipy.stats import norm
+import readData
 
 class World(object):
 		def __init__(self,scale):
@@ -52,24 +53,32 @@ def riseProb(lat,lon, date, delta):
 def setProb(lat,lon,date,delta):
   # for now, same as rise
   return riseProb(lat,lon,date,delta)
+ 
+def mapProb(riseDate,setDate):
+  today = riseDate.date()
+  world = World(1)
+  #today = datetime.date.today()
+  # riseTime = datetime.time(10,2)
+  # setTime = datetime.time(23,26)
+  # riseDate = datetime.datetime.combine(today,riseTime)
+  # setDate = datetime.datetime.combine(today,setTime)
+  lat,lon = 42,-71.264406
+  riseDate,setDate = calcRiseSet(0,0,today)
   
-world = World(1)
-today = datetime.date.today()
-# riseTime = datetime.time(10,2)
-# setTime = datetime.time(23,26)
-# riseDate = datetime.datetime.combine(today,riseTime)
-# setDate = datetime.datetime.combine(today,setTime)
-lat,lon = 42,-71.264406
-riseDate,setDate = calcRiseSet(0,0,today)
-
-for pos in world.allPos():
-  lat,lon = pos
-  rDate,sDate = sunloc.getRiseSet(lat,lon,today)
-  rDif = (rDate - riseDate).total_seconds()
-  sDif = (sDate - setDate).total_seconds()
-  prob = riseProb(lat,lon,today,rDif)*setProb(lat,lon,today,sDif)
-  world.write(pos,prob)
-  
-
-plt.pcolor(world.toArray())	
+  for pos in world.allPos():
+    lat,lon = pos
+    rDate,sDate = sunloc.getRiseSet(lat,lon,today)
+    rDif = (rDate - riseDate).total_seconds()
+    sDif = (sDate - setDate).total_seconds()
+    prob = riseProb(lat,lon,today,rDif)*setProb(lat,lon,today,sDif)
+    world.write(pos,prob)
+    
+  return world
+mooring = readData.readFile("mooring.txt")
+prob1 = mapProb(mooring[0][0],mooring[0][1])
+prob2 = mapProb(mooring[1][0],mooring[1][1])
+plt.figure(1)
+plt.pcolor(prob1.toArray())
+plt.figure(2)
+plt.pcolor(prob2.toArray())
 plt.show()
