@@ -24,10 +24,10 @@ def calcLatLon(riseDate,setDate, approx=(30,-60)):
 		# print current
 		latCur,lonCur = current[1]
 		next = [
-			(latCur+.1,lonCur),
-			(latCur,lonCur+.1),
-			(latCur-.1,lonCur),
-			(latCur,lonCur-.1)
+			(latCur+1,lonCur),
+			(latCur,lonCur+1),
+			(latCur-1,lonCur),
+			(latCur,lonCur-1)
 			]
 		nextVal = []
 		for lat,lon in next:
