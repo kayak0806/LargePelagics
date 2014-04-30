@@ -63,8 +63,8 @@ def mapProb(riseDate,setDate):
   # setTime = datetime.time(23,26)
   # riseDate = datetime.datetime.combine(today,riseTime)
   # setDate = datetime.datetime.combine(today,setTime)
-  lat,lon = 42,-71.264406
-  riseDate,setDate = calcRiseSet(0,0,today)
+  # lat,lon = 42,-71.264406
+  # riseDate,setDate = sunloc.calcRiseSet(0,0,today)
   
   for pos in world.allPos():
     lat,lon = pos
@@ -75,11 +75,38 @@ def mapProb(riseDate,setDate):
     world.write(pos,prob)
     
   return world
+def keywithmaxval(d):
+     """ a) create a list of the dict's keys and values; 
+         b) return the key with the max value"""  
+     v=list(d.values())
+     k=list(d.keys())
+     return k[v.index(max(v))]
+
+def maxProb(world):
+	d = world.values
+	return keywithmaxval(d)
+
+
 mooring = readData.readFile("mooring.txt")
-prob1 = mapProb(mooring[0][0],mooring[0][1])
-prob2 = mapProb(mooring[1][0],mooring[1][1])
+points = 1
 plt.figure(1)
-plt.pcolor(prob1.toArray())
-plt.figure(2)
-plt.pcolor(prob2.toArray())
+for i in range(points):
+	day = mooring[i]
+	probMap = mapProb(day[0],day[1])
+	prob = maxProb(probMap)
+	# check = sunloc.calcRiseSet(-37,-14,day[0].date())
+	# print "given times: ",day
+	# print "calc  times: ",check
+	plt.plot(prob[1],prob[0],'ro')
+plt.axis([-180,180,-90,90])
 plt.show()
+
+
+# prob2 = mapProb(mooring[50][0],mooring[50][1])
+# print maxProb(prob1)
+# prob2 = mapProb(mooring[1][0],mooring[1][1])
+# plt.figure(1)
+# plt.pcolor(prob1.toArray())
+# plt.figure(1)
+# plt.pcolor(prob2.toArray())
+# plt.show()
