@@ -88,18 +88,22 @@ def maxProb(world):
 
 
 mooring = readData.readFile("mooring.txt")
-points = 1
+
+points = 100
 plt.figure(1)
-for i in range(points):
+for i in range(len(mooring)):
 	day = mooring[i]
 	probMap = mapProb(day[0],day[1])
 	prob = maxProb(probMap)
+
 	# check = sunloc.calcRiseSet(-37,-14,day[0].date())
-	# print "given times: ",day
+	# print "given times: ",day`2`2``
 	# print "calc  times: ",check
-	plt.plot(prob[1],prob[0],'ro')
-plt.axis([-180,180,-90,90])
-plt.show()
+	# tmr = day[0].time().hour*60+(day[0].time().minute)
+	# tms = day[1].time().hour*60+(day[1].time().minute)
+	# plt.plot(day[0].date(),(tms-tmr)/60.0,'ro')
+# plt.axis([-180,180,-90,90])
+# plt.show()
 
 
 # prob2 = mapProb(mooring[50][0],mooring[50][1])
