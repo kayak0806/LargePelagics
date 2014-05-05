@@ -13,7 +13,7 @@ class World(object):
 			self.scale = scale
 			self.values = dict()
 			latRange,lonRange = (-89,89),(-179,179)
-			self.lats = [latRange[0]+scale*i  for i in range(int((latRange[1]-latRange[0])/scale))]
+			self.lats = range(latRange[0],latRange[1],scale #[latRange[0]+scale*i  for i in range(int((latRange[1]-latRange[0])/scale))]
 			self.lons = [lonRange[0]+scale*i  for i in range(int((lonRange[1]-lonRange[0])/scale))]
 			for lat in self.lats:
 				for lon in self.lons:
@@ -48,6 +48,7 @@ class World(object):
 
 def riseProb(lat,lon, date, delta):
   # for now, the prob is the same for every location and date
+  
   p = norm(loc=0,scale=5*60)
   #loc = mean, scale=std in seconds
   return p.pdf(delta)
@@ -86,24 +87,35 @@ def maxProb(world):
 	d = world.values
 	return keywithmaxval(d)
 
+def posOut():
+	fin = open("mooringLocations.txt",'r')
+	posout = []
+	for l in fin:
+		pos = l.split(" ")
+		print pos
+		posout.append(pos)
+	return posout
 
 mooring = readData.readFile("mooring.txt")
-
-points = 100
-plt.figure(1)
-for i in range(len(mooring)):
+fint = open("mooringLocations.txt",'r')
+fout = open("mooringLocDate.txt",'w')
+points = len(mooring)
+for i in range(points):
 	day = mooring[i]
 	probMap = mapProb(day[0],day[1])
 	prob = maxProb(probMap)
-
+	fout.write(str(prob[0])+" "+str(prob[1])+"\n")
 	# check = sunloc.calcRiseSet(-37,-14,day[0].date())
 	# print "given times: ",day`2`2``
 	# print "calc  times: ",check
 	# tmr = day[0].time().hour*60+(day[0].time().minute)
 	# tms = day[1].time().hour*60+(day[1].time().minute)
-	# plt.plot(day[0].date(),(tms-tmr)/60.0,'ro')
+	plt.plot(day[0].date(),prob[0],'ro')
+	print i
+fout.close()
+print "ploting"
 # plt.axis([-180,180,-90,90])
-# plt.show()
+plt.show()
 
 
 # prob2 = mapProb(mooring[50][0],mooring[50][1])
